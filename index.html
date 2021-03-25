@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<!--
+
+	NOTES:
+
+	1. All tokens are represented by '$' sign in the template.
+
+	2. You can write your code only wherever mentioned.
+
+	3. All occurrences of existing tokens will be replaced by their appropriate values.
+
+	4. Blank lines will be removed automatically.
+
+	5. Remove unnecessary comments before creating your template.
+
+-->
+
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="authoring-tool" content="Adobe_Animate_CC">
+		<meta name = "viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<title>count faster</title>
+
+		<!-- write your code here -->
+
+		<link href="loadingTxt.css" rel="stylesheet">
+		<script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+		<link rel="stylesheet" type="text/css" href="preloader.css">
+		<script src="libs/createjs-2017.10.12.min.js"></script>
+		<script src="libs/jquery-3.3.1.min.js"></script>
+		<script type="text/javascript" src="screenfull.min.js"></script>
+		<script>
+			function showBlackPatch (showVal) {
+				if (showVal == 1) {
+					//console.log("unpaused");
+					$('#blackpatch').css("background-position", "-9999px -9999px");
+					$('#blackpatch').css("zIndex", -9999);
+					$('#blackpatch').css("transform", "translateZ(-10px)");
+					$('#tap').css("display", "none");
+				} else {
+					//console.log("paused");
+					$('#blackpatch').css("background-position", "center center");
+					$('#blackpatch').css("zIndex", 9999);
+					$('#blackpatch').css("transform", "translateZ(10px)");
+					$('#tap').css("display", "block");
+				}
+			}
+			
+			var gameName = "count faster";
+			var initialLoader;
+			var getJSfile;
+			var canvas, stage, exportRoot, anim_container, dom_overlay_container, fnStartAnimation;
+			var progress_count;
+			var isSound = true;
+			var Paused = false;
+			var active = true;
+			var gameContainer;
+			var preloader_sContainer;
+			var adContainer;
+			var splashContainer;
+			//var resumeButtonContainer;
+			var gameStarted = false;
+			var isAutoResize = true;
+			var isAdPlaying = false;
+			var isMobile;
+			var detectDevice = "windows";
+			
+			var bgPause = new Image();
+			var lockGame = null;
+			var deviceWidth;
+			var deviceHeight;
+			var aspectRatio;
+			var fullScreenMode;
+			var gameMode;
+
+			var fb_INTERSTITIAL_PLACEMENT_ID = '297350730860260_297362080859125';
+			var fb_REWARDAD_PLACEMENT_ID = '297350730860260_297362727525727';
+			var fb_preloadedRewardedVideo = null;
+			var fb_preloadedInterstitial = null;
+			var isInstantGames;
+			
+			var manifest = [];
+			var sound_manifest = [];
+			
+			var lib, images, createjs, ss, AdobeAn;
+			
+
+			var winMSC,welcomeMSC;
+	
+			getJSfile = function(src) {
+				console.log("started loading")
+				var jsfile = $("<script type='text/javascript' src='"+src+"'>");
+				$("head").append(jsfile); 
+				//console.log("loading done");
+				
+			}; 
+			function init() {
+				isInstantGames = false;
+				gameContainer = document.getElementById("container");	// used for grey background of cover page
+				canvas = document.getElementById("canvas");
+				splashContainer = document.getElementById("splash-screen");
+				preloader_sContainer = document.getElementById("preloader_s");
+				anim_container = document.getElementById("animation_container");
+				dom_overlay_container = document.getElementById("dom_overlay_container");
+				//progress_bar = document.getElementById("progress-bar");
+				progress_count = document.getElementById("progress_count");
+				portraitDiv = document.getElementById("portraitHint");
+				portraitDiv.style.display = 'none';
+
+				if(!isInstantGames){
+					//getJSfile('../AdSense.js');
+					initGame();
+				} else {
+					preloader_sContainer.style.display = 'none';
+					FBInstant.initializeAsync().then(function() {
+						initGame();
+					});
+				}
+			}
+			
+			function initGame(){
+				//console.log("-- init Game called --");
+				fullScreenMode = false;
+				deviceWidth = screen.width;
+				deviceHeight = screen.height;
+				aspectRatio = deviceWidth/deviceHeight;
+				
+				isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+				
+				if(!isInstantGames) {
+					try {
+					} catch(err) {
+						document.getElementById("adContent").style.display = "none";
+						if(isSound && active  && lockGame == null) {
+							createjs.Sound.volume = 1;
+						}
+						//console.log("Ad error called FROM INIT GAME: " + err);
+					}
+				}
+				
+				images = images||{};
+				
+				var loader = new createjs.LoadQueue(true);	
+				
+				//console.log(window.innerHeight,window.outerHeight, window.height,$(window).height(), "XXX");
+				loader.setMaxConnections(20);
+				loader.installPlugin(createjs.Sound);
+				
+				manifest = 	[
+					{src:"images/_380.png?1616695126662", id:"_380"},
+		{src:"images/_381.png?1616695126662", id:"_381"},
+		{src:"images/_389.png?1616695126662", id:"_389"},
+		{src:"images/BGinstructions.png?1616695126662", id:"BGinstructions"},
+		{src:"images/Bitmap1.png?1616695126662", id:"Bitmap1"},
+		{src:"images/Bitmap13.png?1616695126662", id:"Bitmap13"},
+		{src:"images/Bitmap14.png?1616695126662", id:"Bitmap14"},
+		{src:"images/Bitmap16.png?1616695126662", id:"Bitmap16"},
+		{src:"images/Bitmap18.png?1616695126662", id:"Bitmap18"},
+		{src:"images/Bitmap2.png?1616695126662", id:"Bitmap2"},
+		{src:"images/Bitmap22.png?1616695126662", id:"Bitmap22"},
+		{src:"images/Bitmap5.png?1616695126662", id:"Bitmap5"},
+		{src:"images/Bitmap714.png?1616695126662", id:"Bitmap714"},
+		{src:"images/Bitmap719.png?1616695126662", id:"Bitmap719"}
+				];
+				
+				sound_manifest = [
+				{id:"WelcomeSound", src:"sounds/WelcomeSound.mp3"},
+			{id:"WinSound", src:"sounds/WinSound.mp3"},
+			{id:"ClickSound", src:"sounds/ClickSound.mp3"}
+				];
+				
+				loader.addEventListener("progress", handleProgress);
+				loader.addEventListener("fileload", handleFileLoad);
+				loader.addEventListener("complete", handleComplete);
+				
+				loader.loadFile({ src: 'countfaster1.js', type: createjs.Types.JAVASCRIPT });
+				
+				loader.loadManifest(sound_manifest);
+				loader.loadManifest(manifest);
+				
+				
+				getMobileOperatingSystem();
+				screenfull.on('change', () => {
+					//console.log('Am I fullscreen?', screenfull.isFullscreen ? 'Yes' : 'No');
+					if(detectDevice != "IOS"){
+						if (screenfull.isFullscreen){
+							fullScreenMode = true;
+							makeResponsive(true,'both',true,3);	
+							toogleFullScreenBtn();
+							//console.log("_______________FullScreen");
+						}else{
+							fullScreenMode = false;
+							makeResponsive(true,'both',true,1);	
+							toogleFullScreenBtn();
+							//console.log("_______________FullScreen");
+						}
+					}
+				});
+				if (screenfull.enabled) {
+					screenfull.on('error', event => {
+						alert('Please try after sometime');
+					});
+				}
+			}
+			// ----- FOR FB  AD START ------
+			function loadInterstitial() {
+				FBInstant.getInterstitialAdAsync(fb_INTERSTITIAL_PLACEMENT_ID,).then(function(interstitial) {
+					  fb_preloadedInterstitial = interstitial;
+					  return fb_preloadedInterstitial.loadAsync();
+					}).then(function() {
+						// showElement('btn-interstitial');
+					}).catch(function(err){
+					 // //console.log('Interstitial failed to preload: ' + err.message);
+				});
+			}
+			function loadRewardVideo() {
+				FBInstant.getRewardedVideoAsync(fb_REWARDAD_PLACEMENT_ID,).then(function(rewarded){
+					fb_preloadedRewardedVideo = rewarded;
+					return fb_preloadedRewardedVideo.loadAsync();
+				}).then(function() {
+					  // showElement('btn-rewarded-video');
+				}).catch(function(err){
+					//console.log('Rewarded video failed to preload:' + err.message);
+				});
+			}
+			function showInterstitial() {    
+				if(true){
+				  fb_preloadedInterstitial.showAsync()
+				  .then(function() {
+					getReward();
+				  })
+				  .catch(function(e) {
+					//console.log(e.message);
+				  });
+				  loadInterstitial();
+				} else{
+					//console.log("Ads not supported in this platform");
+				}
+			}
+			function showRewardedVideo() {
+				if(true){
+					//console.log("-- Reward Video Playing --");
+					fb_preloadedRewardedVideo.showAsync()
+					.then(function() {
+						getReward();
+					})
+					.catch(function(e) {
+						levelupLockUnlock();
+						//console.log(e.message);
+					});
+					loadRewardVideo();
+				}else{
+					//console.log("Reward Ads not supported in this platform");
+				}
+			}
+			function getReward(){
+				levelupLockUnlock();
+			}
+			// ----- FOR FB  AD END ------
+			function handleProgress(progress) {
+				//console.log("handle Progress called");
+				var loadedPercent = progress.loaded * 100;
+				if(isInstantGames){
+					FBInstant.setLoadingProgress(loadedPercent);
+				}else{
+					progress_count.innerHTML = Math.floor(loadedPercent) + '%';
+				}
+
+			}
+			var count = 0;
+			function handleFileLoad(evt) {
+				//console.log("handle file loaded: " + evt.item.src);
+				if(evt.item.type == createjs.Types.JAVASCRIPT){
+					var head = document.getElementsByTagName('head');
+					head[0].append(evt.result);	
+					//console.log("Javascript Completed");
+				}
+				if (evt.item.type == "image") { 
+					count++;
+					//console.log(count);
+					images[evt.item.id] = evt.result; 
+				}	
+				/*if (evt.item.type == "image") { 
+					count++;
+					//console.log(count);
+					imagesArray[evt.item.id] = evt.result; 
+				}*/
+			}
+			function handleComplete(evt) {
+				//This function is always called, irrespective of the content. You can use the variable "stage" after it is created in token create_stage.
+				console.log("-- handleComplete called --");
+				for(let key in images){
+					images[key]= images[key];
+					//console.log(key);
+				}
+				
+				var queue = evt.target;
+				i=0;
+				var progressDiv = document.getElementById("progress_div");
+
+				progressDiv.style.display = 'none';
+				preloader_sContainer.style.display = 'none';
+
+				canvas.style.display = 'block';
+
+				splashContainer.style.display = 'block';
+				
+				$("#playBtnImg").click(onClick);
+				$("playBtnImg").mousedown(function(){
+					return false;
+				});
+				$("#blackpatch").click(onTap);
+
+				showBlackPatch(1);
+
+				exportRoot = new lib.countfaster1();
+
+				stage = new createjs.Stage(canvas);
+
+				stage.addChild(exportRoot);
+
+				stage.enableMouseOver();
+
+				$("#container").css({
+					'background':'-webkit-linear-gradient(left,#708A7D, #A87E66, #708A7D)',        
+				});
+
+				//Registers the "tick" event listener.
+
+				fnStartAnimation = function() {
+					createjs.Ticker.framerate = lib.properties.fps;
+					createjs.Ticker.addEventListener("tick", stage);
+
+				}	    
+				if (isInstantGames) {
+					FBInstant.startGameAsync().then(function () {
+						var supportedAPIs = FBInstant.getSupportedAPIs();
+
+						if (supportedAPIs.includes('getInterstitialAdAsync') && supportedAPIs.includes('getRewardedVideoAsync')) {
+							loadInterstitial();
+							loadRewardVideo();
+							//console.log("Ads loaded");
+						} else {
+							//console.log('Ads not supported in this session');
+						}
+					});
+				}
+				//Code to support hidpi screens and responsive scaling.
+				makeResponsive = function(isResp, respDim, isScale, scaleType) {	
+					var lastW, lastH, lastS=1;	
+					window.removeEventListener('resize', resizeCanvas);
+					window.addEventListener('resize', resizeCanvas);		
+					resizeCanvas();		
+					function resizeCanvas() {	
+						setTimeout(function() {		
+							var w = lib.properties.width, h = lib.properties.height;			
+							var iw = window.innerWidth, ih=window.innerHeight;			
+							var pRatio = window.devicePixelRatio || 1, xRatio=iw/w, yRatio=ih/h, sRatio=1;		
+							if (scaleType == 3) {
+								canvas.width = w*pRatio*xRatio;
+								canvas.height = h*pRatio*yRatio;
+								canvas.style.width = anim_container.style.width = preloader_sContainer.style.width = dom_overlay_container.style.width = portraitDiv.style.width = splashContainer.style.width = w*xRatio + 'px';
+								canvas.style.height = anim_container.style.height = preloader_sContainer.style.height = dom_overlay_container.style.height = splashContainer.style.height = portraitDiv.style.height = h*yRatio + 'px';
+								stage.scaleX = pRatio*xRatio;
+								stage.scaleY = pRatio*yRatio;
+								lastW = iw; lastH = ih; lastS = sRatio;
+							} else {
+								if(isResp) {                
+									if((respDim=='width'&&lastW==iw) || (respDim=='height'&&lastH==ih)) {                    
+										sRatio = lastS;                
+									}				
+									else if(!isScale) {					
+										if(iw<w || ih<h)						
+											sRatio = Math.min(xRatio, yRatio);				
+									}				
+									else if(scaleType==1) {					
+										sRatio = Math.min(xRatio, yRatio);				
+									}				
+									else if(scaleType==2) {					
+										sRatio = Math.max(xRatio, yRatio);				
+									}			
+								}			
+								canvas.width = w*pRatio*sRatio;			
+								canvas.height = h*pRatio*sRatio;
+								canvas.style.width = anim_container.style.width = preloader_sContainer.style.width = dom_overlay_container.style.width = portraitDiv.style.width = splashContainer.style.width = w*sRatio+'px';				
+
+								canvas.style.height = anim_container.style.height = preloader_sContainer.style.height = dom_overlay_container.style.height = splashContainer.style.height = portraitDiv.style.height = h*sRatio+'px';
+								stage.scaleX = pRatio*sRatio;			
+								stage.scaleY = pRatio*sRatio;			
+								lastW = iw; lastH = ih; lastS = sRatio;	
+							}
+							if(gameContainer.offsetHeight > gameContainer.offsetWidth){
+								gameMode = "portrait";
+								portraitDiv.style.display = 'block';
+								splashContainer.style.display = 'none';
+								showBlackPatch(1);
+								if(lockGame == null){
+									//console.log("Orientation change: Portrait");
+									lockGame = 1;
+									createjs.Sound.volume = 0.0001;
+									showBlackPatch(1);
+								}
+							}else{
+								//console.log("Orientation change: Landscape");
+								gameMode = "landscape";
+								portraitDiv.style.display = 'none';
+								if(!gameStarted){
+									splashContainer.style.display = 'block';
+									$("#container").css({
+										'background':'-webkit-linear-gradient(left,#708A7D, #A87E66, #708A7D)',            
+									});
+								}
+								if(lockGame != null){
+									lockGame = null;
+									$('html').css("background-image", "url(\"\")");
+									if (isSound && !isAdPlaying && active && !Paused) {
+										//console.log("Sound turned ON");
+										createjs.Sound.volume = 1;
+									} else {
+										//console.log("Sound turned OFF");
+										createjs.Sound.volume = 0.0001;
+									}
+									if(Paused) {
+										showBlackPatch(2);
+									}
+								}
+							}
+						}, 100);
+					}
+				}
+				if(isMobile)
+					makeResponsive(true,'both',true,3);	
+				else
+					makeResponsive(true,'both',true,1);	
+
+				fnStartAnimation();
+
+			}
+			function playSound(id, loop) {
+				var isLoop = 0;
+				if(loop) {
+					isLoop = -1;
+				}
+				var props = new createjs.PlayPropsConfig().set({interrupt: createjs.Sound.INTERRUPT_EARLY, loop: isLoop});
+				return createjs.Sound.play(id, props);
+			}
+			function stopSound(snd) {
+			//	//console.log("stopSound", snd);
+				if(snd)
+					snd.stop();
+			}
+			
+			// Set the name of the hidden property and the change event for visibility
+			var hidden, visibilityChange; 
+
+			if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support 
+				hidden = "hidden";
+				visibilityChange = "visibilitychange";
+			} else if (typeof document.msHidden !== "undefined") {
+				hidden = "msHidden";
+				visibilityChange = "msvisibilitychange";
+			} else if (typeof document.webkitHidden !== "undefined") {
+				hidden = "webkitHidden";
+				visibilityChange = "webkitvisibilitychange";
+			}
+	
+			// If the page is hidden, pause the video;
+
+			// if the page is shown, play the video
+
+
+			function handleVisibilityChange() {
+				//console.log("Visibility change");
+				if (document[hidden]) {
+					//console.log("Document is hidden");
+					if(!gameStarted)return;
+						active = false;
+						createjs.Sound.volume = 0.0001;
+						if(!isAdPlaying && gameMode == "landscape")
+							callPause();
+				} else {
+					//console.log("Document is visible");
+					if(!gameStarted)return;
+					//console.log(isSound, isAdPlaying, lockGame, Paused, "77777777");
+					if(isSound && !isAdPlaying && lockGame == null && !Paused)
+						createjs.Sound.volume = 1;
+
+					active = true;
+				}
+			}
+	
+			// Warn if the browser doesn't support addEventListener or the Page Visibility API
+
+			if (typeof document.addEventListener === "undefined" || hidden === undefined) {
+				//console.log("This demo requires a browser, such as Google Chrome or Firefox, that supports the Page Visibility API.");
+			} else {
+				// Handle page visibility change   
+				document.addEventListener(visibilityChange, handleVisibilityChange, false);
+			}
+			window.oncontextmenu = function(event) {
+				 event.preventDefault();
+				 event.stopPropagation();
+				 return false;
+			};
+			function preventDrag(evt) {
+				evt.preventDefault();
+			}
+			function gotoFullScreen(evt) {
+				//alert("gull screen");   
+			}
+			function getMobileOperatingSystem() {
+				var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+				// Windows Phone must come first because its UA also contains "Android"
+				if (/windows phone/i.test(userAgent)) {
+					//windows
+				}
+				if (/android/i.test(userAgent)) {
+					// android
+					detectDevice = "Android";
+				}
+				if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+					detectDevice = "IOS";
+				}
+			}
+			function onClick() {
+				if(isMobile){
+					if (screenfull.enabled) {
+						//console.log("Fullscreen is available");
+						screenfull.request();
+					} else {
+						//console.log("Fullscreen not available");
+					}
+				}
+				gameStarted = true;
+				if(!isInstantGames) {
+				}
+				playSound("clickSound")
+				welcomeMSC = playSound("WelcomeSound", -1);
+				
+				splashContainer.style.display = 'none';
+
+				createWelcome();
+				//createWinScreen();
+				 console.log("createWelcome called");
+				//showLevelUp();
+				//startGame();
+				$("#container").css({
+					'background':'-webkit-linear-gradient(left,#ffffff, #ffffff, #ffffff)',        
+				});
+			}
+			function onTap(){
+				playSound("clickSound");
+				$('#blackpatch').css("background-position", "-9999px -9999px");
+				$('#blackpatch').css("zIndex", "-9999");
+				$('#blackpatch').css("transform", "translateZ(-10px)");
+				
+				callUnpause();
+			}
+			function hideMouse(){
+				 $('html').css({
+				cursor: 'none'
+			  });
+			}
+			function showMouse(){
+				$('html').css({
+				  cursor: 'default'
+				});
+			}
+	
+		</script>
+
+		<!-- write your code here -->
+		<link rel="stylesheet" type="text/css" href="bootstrap-3.3.7.min.css">
+	</head>
+	<body  onload="init();" ontouchmove="preventDrag(event);">
+		<div id = "container" ontouchstart="gotoFullScreen(event);">
+			<div id="animation_container" style="background-color:rgba(51, 204, 153, 0.00); width:800px; height:480px" ontouchstart="preventDrag(event);">
+				<canvas id="canvas" width="800" height="480" style="position: absolute; display: none; background-color:rgba(51, 204, 153, 0.00);"></canvas>
+				<div id="dom_overlay_container" style="pointer-events:none; overflow:hidden; width:800px; height:480px; position: absolute; left: 0px; top: 0px; display: none;"></div>
+			</div>
+		
+			<div class="container2">
+				<img id = "captureImage" width="100%" class="screen" style="position:absolute; top:0px; left:0px;">
+			</div>
+		
+			<div id = "blackpatch" draggable="false" ondragstart="return false;">
+				<center>
+					<div id = "tap" class= "tap_class" style="display:block; width: 100%; position: absolute; font-size: 3.5vw;color:#ffffff;bottom:0; text-align: center; line-height: 80px;" ontouchstart="preventDrag(event);">Tap anywhere to start</div>
+				</center>
+			</div>
+		
+			<div id = "portraitHint" draggable="false" ondragstart="return false;" ontouchstart="preventDrag(event);">
+				<center>
+					<img src="portrait.png" alt="Play in landscape mode" style="max-width:70%">
+				</center>
+			</div>
+		
+			<div id="adContent" >
+				<div id="adContainer">
+					<video id="contentElement">
+						<source src=""></source>
+					</video>
+				</div>
+			</div>
+		</div>
+	
+		<div id="splash-screen" draggable="false" ondragstart="return false;">
+			<div id="splash">
+				<div id="splashImage" ontouchstart="preventDrag(event);">
+					<img src="thumb.png">
+				</div>
+				<div id="playbtn" class="playbtn_class">
+					<img id="playBtnImg" src="play_btn.png" type="button">
+				</div>
+			</div>
+		</div>
+	
+		<div>
+			<div id = "preloader_s"  draggable="false" ondragstart="return false;" ontouchstart="preventDrag(event);">
+				<center>
+					<img src="preloader_s.png">
+					<div id= "progress_div" style= "position: absolute; left: 50%; top: 50%; padding-top:25%; transform: translate(-50%, -50%);">
+						<div id = "progress_count" style="display:block; width: 100%; position: relative; font-size: 3vw; text-align: center; font-family: 'Pacifico', cursive; color:#ad35e8">Loading...</div>
+					</div>
+				</center>
+			</div>
+		</div>
+	</body>
+</html>
