@@ -1,0 +1,210 @@
+body {
+	margin: 0; 
+	height: 100%; 
+	overflow: hidden
+}
+#animation_container {
+	position:absolute;
+	margin:auto;
+	left:0;right:0;
+	top:0;bottom:0;
+	-webkit-user-select:none;
+	-webkit-touch-callout:none;
+}
+#preloader_hazel{
+	-webkit-user-select:none;
+	-webkit-touch-callout:none;
+}
+#preloader_hazel img{
+	position: absolute;
+	margin:auto;
+	width:40%;
+	left:0;right:0;
+	top:50%;bottom:50%;
+	-webkit-user-select:none;
+	-webkit-touch-callout:none;
+}
+#bg{
+	background-image: url("");
+	background-repeat:no-repeat;
+	background-size:cover;
+}
+.bg-1 { 
+	background-color: #1e2c2ab3; Green
+	color: #ffffff;
+}
+.margin {margin-bottom: 15px;}
+.container-fluid {
+	margin-top: 10%;
+	padding-bottom: 10px;
+}
+.tap_class{
+	animation:blinkingText 1.5s infinite;
+}
+@keyframes blinkingText{
+   0%{		color: transparent;	}
+	50%{	color: #fff;	}
+	
+	
+	100%{	color: transparent;	}
+}
+#splash-screen {
+	background-color: #1e2c2ab3;
+	display: none;
+	-webkit-user-select:none;
+	-webkit-touch-callout:none;
+}
+#splash {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 100%;
+	height: 70%;
+	background-color: rgba(0, 0, 0, 0.3);
+}
+#splashImage img {
+	position: absolute;
+	height: 60%;
+	top: 10%;
+	left: 50%;
+	transform: translate(-50%, 0%);
+	-webkit-user-select:none;
+	-webkit-touch-callout:none;
+}
+#playbtn {
+	height: 90%;
+	width: 90%;
+	-webkit-user-select:none;
+	-webkit-touch-callout:none;
+}
+#playbtn img {
+	position: absolute;
+	top: 85%;
+	left: 50%;
+	height: 30%;
+	transform: translate(-50%, -50%);
+	-webkit-user-select:none;
+	-webkit-touch-callout:none;
+}
+.playbtn_class img {
+	animation: play_btn_anim 1s infinite;
+}
+@keyframes play_btn_anim {
+	0% {
+		height: 20%;
+	}
+	50% {
+		height: 25%;
+	}
+	100% {
+		height: 20%;
+	}
+}
+#container{
+
+	position: absolute;
+
+	height: 100%;
+
+	width: 100%;
+
+}
+#portraitHint{
+	height:100% !important;
+	width:100% !important;
+	background-color:#fff;
+	position: absolute;
+	display : none;
+}
+#portraitHint img{
+	position:absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+#blackpatch{
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	background: url("Bg_Pause.jpg") no-repeat -9999px -9999px;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+	z-index: -9999;
+	transform: translateZ(-10px);
+	-webkit-user-select:none;
+	-webkit-touch-callout:none;
+}
+#tap{
+	display:none;
+}
+@media only screen and (orientation:portrait){
+	#canvas{
+		visibility: hidden;
+	}
+	#bgImage1, #bgImage2, #bgImage3{ 
+		visibility: hidden;
+	}
+	#container { 
+		background: no-repeat;
+		-webkit-background-size: cover;
+		-moz-background-size: cover;
+		-o-background-size: cover;
+		background-size: cover;
+	}
+	html { 
+		background: no-repeat;
+		-webkit-background-size: cover;
+		-moz-background-size: cover;
+		-o-background-size: cover;
+		background-size: cover;
+	}
+}
+
+@media only screen and (orientation:landscape){
+	#container { 
+		background: no-repeat center center fixed; 
+		-webkit-background-size: cover;
+		-moz-background-size: cover;
+		-o-background-size: cover;
+		background-size: cover;
+	}
+	#animation_container {
+		margin-bottom: 0px;
+	}
+}
+#bgImage2{
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	background: url("Bg_Step_1.jpg") no-repeat -9999px -9999px;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+	display:block;
+}
+#bgImage3{
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	background: url("Bg_Step_2.jpg") no-repeat -9999px -9999px;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+	display:block;
+}
+#bgImage1{
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	background: url("Bg_Step_3.jpg") no-repeat -9999px -9999px;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+	display:block;
+}
